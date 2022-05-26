@@ -27,9 +27,9 @@ module.exports = mongoose.model("List", listSchema )
 
 // db.lists.insert(
 // {
-//         "listId" : 4,
-//         "title": "아자아자",
-//         "name": "이창민",
-//         "content": "로론애ㅔㅑ러",
-//         "password": 331   
-//     }
+//     "listId" : 4,
+//     "title": "아자아자",
+//     "name": "이창민",
+//     "content": "로론애ㅔㅑ러",
+//     "password": 331   
+// }
