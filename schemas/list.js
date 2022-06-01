@@ -2,34 +2,26 @@ const mongoose = require('mongoose')
 const listSchema = new mongoose.Schema({
     listId: {
         type: Number,
-        require: true,
         unique: true,
+        require:true,
     },
     title: {
         type: String,
+        require:true,
     },
-    name: {
+    nickname: {
         type: String,
+        require:true,
     },
     content: {
         type: String,
-    },
-    password: {
-        type: Number,
-        required: true,
+        require:true,
     },
     createAt: {
-        type: Date
-      }
+        type: Date,
+        require:true,
+    },
+
 })
-
+//listId,title,content만 적으면 자동으로 nickname,createAt들어가게할거
 module.exports = mongoose.model("List", listSchema )
-
-// db.lists.insert(
-// {
-//     "listId" : 4,
-//     "title": "아자아자",
-//     "name": "이창민",
-//     "content": "로론애ㅔㅑ러",
-//     "password": 331   
-// }
