@@ -6,11 +6,11 @@ const Joi = require("joi");
 const authMiddleware = require('./middlewares/auth-middleware')
 
 const app = express()
-const port = 8080
+const port = 3000
 
 //#mongodb연결
 mongoose.connect('mongodb+srv://test:sparta@cluster0.bf4q6.mongodb.net/?retryWrites=true&w=majority',{ 
-    dbName : "blogAPI" ,
+    dbName : "4W_blogAPI" ,
     ignoreUndefined : true,
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -47,11 +47,15 @@ router.post('/lists',authMiddleware,async(req,res)=>{
     const user = res.locals.user
     const nickname = user.nickname
     console.log("글쓴이정보",user)
-    const { listId, title, content } = req.body
-    const list = await List.find({ listId })
-    if(list.length){
-        return res.status(400).json({ success:false, errorMessage: '이미 있는 게시글번호입니다.'})
+    const { title, content } = req.body
+    
+
+    const maxListId = await List.findOne().sort("-listId")
+    let listId = 1
+    if(maxListId){
+        listId = maxListId.listId + 1
     }
+    
     const createdlist = await List.create({ listId, title, content, nickname , createAt })
     res.json({ list : createdlist })
 
@@ -82,7 +86,7 @@ router.put('/lists/:listId',authMiddleware ,async(req,res)=>{
     const existList = await List.find({ listId: Number(listId)})
     const user = res.locals.user
     const {content, title, name } = req.body
-    if(!existList){
+    if(existList.length === 0 ){
         return res.status(200).json({errorMessage:'수정하려는 게시글이 없습니다.'})
     }
     if(user.nickname !== existList[0].nickname){
@@ -108,17 +112,23 @@ router.get('/lists/:listId', async (req,res)=>{
     })
 
 })
-//댓글 쓰기,수정,삭제 기능이 문제
+//댓글관련(쓰기,삭제,수정)
 router.post('/lists/:listId', authMiddleware, async (req,res)=>{
     var createAt = moment().add('9','h').format('YYYY-MM-DD HH:mm:ss')
     const listId = req.params.listId
-    const { commentId, content,title } = req.body
+    const { content,title } = req.body
     const nickname = res.locals.user.nickname
 
-    const existcomment = await Comment.find({$and:[{listId},{commentId} ]})
-    console.log('existcomment의 정보는',existcomment,'입니다')
-    if(existcomment.length > 0){
-        return res.json({ errorMessage : "이미 존재하는 commentId입니다." })
+    const maxCommentId = await Comment.findOne({listId:listId}).sort({commentId:-1})
+    console.log("maxCommentId정보는",maxCommentId,"입니다.")
+    const targetList = await List.findOne({listId:listId})
+    if(targetList === null){
+        return res.status(400).json({errorMessage: '존재하지 않은 게시글입니다.'})
+    }
+
+    let commentId = 1
+    if(maxCommentId){
+        commentId = maxCommentId.commentId + 1
     }
 
     await Comment.create({ commentId, listId, nickname, content,title,createAt })
@@ -238,3 +248,6 @@ router.post("/auth", async (req, res) => {
 app.listen(port, () => {
     console.log(port, '포트가 켜졌어요')
 })
+
+//보안할점 정확한status코드명시와 send 하는 메세지 키값을 successMessage,errorMessage 둘중 하나만 포함하고 통일하기,
+//라우터 분리
