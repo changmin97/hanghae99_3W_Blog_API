@@ -29,7 +29,7 @@ describe('Site 요구사항 테스트', () => {
         }).toThrow();
     });
 
-    test('Board는 n개 이상 추가 할 수 있다.', () => {   //위의 조건만 신경쓰면 저절로 해결되는 문제
+    test('Board는 n개 이상 추가 할 수 있다.', () => {
         const mySite = new Site();
         const noticeBoard = new Board('공지사항');
         const faqBoard = new Board('FAQ');
@@ -103,6 +103,7 @@ describe('Board 요구사항 테스트', () => {
             author: '강승현',
         });
         noticeBoard.publish(article);
+        console.log(article)
 
         // 규칙은 ${board.name}-${랜덤 값} 를 따른다.
         expect(article.id.startsWith('공지사항-')).toBe(true);
@@ -165,6 +166,7 @@ describe('Board 요구사항 테스트', () => {
 
         expect(noticeBoard.getAllArticles()).toEqual([article, article2]);
     });
+
 });
 
 describe('Article 요구사항 테스트', () => {
